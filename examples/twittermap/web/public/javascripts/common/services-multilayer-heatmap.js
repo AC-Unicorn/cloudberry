@@ -1,5 +1,5 @@
 angular.module('cloudberry.common')
-    .service('multilayerHeatmap', function($timeout, $q, cloudberry, cloudberryConfig,multilayerPolygon){
+    .service('multilayerHeatmap', function($timeout, $q, cloudberry, cloudberryConfig){
         var defaultHeatmapLimit = parseInt(config.heatmapSamplingLimit);
         var defaultHeatmapSamplingDayRange = parseInt(config.heatmapSamplingDayRange);
         var defaultNonSamplingDayRange = 1500;
@@ -8,8 +8,8 @@ angular.module('cloudberry.common')
             var unitRadius = parseInt(config.heatmapUnitRadius); // getting the default radius for a tweet
             this.layer = L.heatLayer([], {radius: unitRadius});
             var instance = this;
-            var polygon = multilayerPolygon.createLayer();
-            polygon.$$state.value.init()
+           
+            
             var deferred = $q.defer();
             deferred.resolve();
             return deferred.promise;

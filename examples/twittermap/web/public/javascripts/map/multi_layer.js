@@ -4,6 +4,56 @@ angular.module('cloudberry.map')
     cloudberry.parameters.layers = {};
     $scope.watchVariables = {};
     
+    var styles = {
+        initStyle: {
+          weight: 0.5,
+          fillOpacity: 0,
+          color: "white"
+        },
+        stateStyle: {
+          fillColor: "#f7f7f7",
+          weight: 0.5,
+          opacity: 1,
+          color: "#92d1e1",
+          fillOpacity: 0
+        },
+        stateUpperStyle: {
+          fillColor: "#f7f7f7",
+          weight: 0.5,
+          opacity: 1,
+          color: "#92d1e1",
+          fillOpacity: 0
+        },
+        countyStyle: {
+          fillColor: "#f7f7f7",
+          weight: 0.5,
+          opacity: 1,
+          color: "#92d1e1",
+          fillOpacity: 0
+        },
+        countyUpperStyle: {
+          fillColor: "#f7f7f7",
+          weight: 0.5,
+          opacity: 1,
+          color: "#92d1e1",
+          fillOpacity: 0
+        },
+        cityStyle: {
+          fillColor: "#f7f7f7",
+          weight: 0.5,
+          opacity: 1,
+          color: "#92d1e1",
+          fillOpacity: 0
+        },
+        hoverStyle: {
+          weight: 0.7,
+          color: "#666",
+          fillOpacity: 0
+        },
+        colors: [ "#ffffff", "#92d1e1", "#4393c3", "#2166ac", "#f4a582", "#d6604d", "#b2182b"],
+        sentimentColors: ["#ff0000", "#C0C0C0", "#00ff00"]
+      }
+    
     // initialize
     
     $rootScope.$on('multiLayer', function (event, data) {
@@ -24,6 +74,8 @@ angular.module('cloudberry.map')
         }
         if (layer_name==='heatmap' || layer_name === 'pinmap' && cloudberry.parameters.layers[layer_name].active == 0 ){
             
+            $scope.setStyles(styles);
+            $scope.resetPolygonLayers();
             if (typeof cloudberry.parameters.layers[layer_name].activate === "function"){
                 cloudberry.parameters.layers[layer_name].activate();
             }
