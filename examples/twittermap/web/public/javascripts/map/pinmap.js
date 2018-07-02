@@ -301,7 +301,7 @@ angular.module("cloudberry.map")
     // map type change handler
     // initialize the map (styles, zoom/drag handler, etc) when switch to this map
     // clear the map when switch to other map
-    $rootScope.$on("maptypeChange", function (event, data) {
+    /*$rootScope.$on("maptypeChange", function (event, data) {
       if (cloudberry.parameters.maptype === "pinmap") {
         setPinMapStyle();
         $scope.resetPolygonLayers();
@@ -314,10 +314,10 @@ angular.module("cloudberry.map")
       else if (data[0] === "pinmap"){
         cleanPinMap();
       }
-    })
+    }) */
     
     // monitor the pinmap related variables, update the pinmap if necessary
-    $scope.$watch(
+    /*$scope.$watch(
       function() {
         return cloudberry.pinmapMapResult;
       },
@@ -334,5 +334,5 @@ angular.module("cloudberry.map")
           }
         }
       }
-    );
+    );*/
   });

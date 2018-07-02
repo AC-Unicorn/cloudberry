@@ -11,17 +11,20 @@ angular.module('cloudberry.map')
     
         
         
-        if(layer_name!='heatmap'){
+        if(layer_name!='heatmap' || layer_name!='pinmap'){
 
                     $scope.map.removeLayer(cloudberry.parameters.layers['heatmap'].layer);
-                    
+                    $scope.map.removeLayer(cloudberry.parameters.layers['pinmap'].layer);
+
                     
                     cloudberry.parameters.layers['heatmap'].active = 0;
+                    cloudberry.parameters.layers['pinmap'].active = 0;
+
         
         }
-        if (layer_name==='heatmap' && cloudberry.parameters.layers[layer_name].active == 0 ){
+        if (layer_name==='heatmap' || layer_name === 'pinmap' && cloudberry.parameters.layers[layer_name].active == 0 ){
             
-            if (typeof cloudberry.parameters.layers[layer_name].activate === "function"){c
+            if (typeof cloudberry.parameters.layers[layer_name].activate === "function"){
                 cloudberry.parameters.layers[layer_name].activate();
             }
             cloudberry.parameters.layers[layer_name].active = 1;
@@ -55,6 +58,30 @@ angular.module('cloudberry.map')
         dataset: "twitter.ds_tweet",
     }
     addLayer("heatmap", 0, heatmapParameters);
+    
+    var pinmapParameters = {
+        id: "pinmap",
+        dataset: "twitter.ds_tweet",
+        pinStyle: {
+            opacity: 0.8,
+            radius: 1.2,//80,
+            useAbsoluteRadius: false,//true,
+            color: "#00aced",//"#0084b4"
+            noMask: true,
+            lineColor: "#00aced"//"#00aced"
+        },
+        highlightPinStyle: {
+            radius : 6,
+            color : "#0d3e99",
+            weight : 3,
+            fillColor : "#b8e3ff",
+            fillOpacity : 1.0
+        }
+    }
+    
+    addLayer("pinmap", 0, pinmapParameters);
+
+    
     
 
     

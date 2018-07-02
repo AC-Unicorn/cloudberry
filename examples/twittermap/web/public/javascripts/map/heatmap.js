@@ -154,7 +154,7 @@ angular.module("cloudberry.map")
       else if (data[0] === "heatmap"){
         cleanHeatMap();
       }
-    })
+    }) 
     
     /*$scope.$watch(
       function() {
