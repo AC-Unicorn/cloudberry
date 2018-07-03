@@ -555,7 +555,7 @@ angular.module('cloudberry.common', ['cloudberry.mapresultcache'])
             switch (result.category) {
 
               case "sample":
-                cloudberryService.commonTweetResult = result.value[0];Rt
+                cloudberryService.commonTweetResult = result.value[0];
                 break;
               // Complete cache hit case
               case "batchWithoutGeoRequest":
