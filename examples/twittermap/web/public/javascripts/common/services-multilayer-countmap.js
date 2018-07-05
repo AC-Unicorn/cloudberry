@@ -113,11 +113,11 @@ angular.module('cloudberry.common')
                 return this._div;
             };
 
-            info.options = {
+            /*info.options = {
                 position: 'topleft'
             };
-            //info.addTo(instance.map);
-            //$scope.controls.custom.push(info);
+            info.addTo(instance.map);
+            $scope.controls.custom.push(info);*/
             
             // update the center and the boundary of the visible area of the map
             function setCenterAndBoundry(features){
@@ -486,13 +486,13 @@ angular.module('cloudberry.common')
             }
           }
 
-          /*
+          
           // add legend
           addMapControl('legend', 'topleft', initLegend, null);
-
+          
           // add toggle normalize
           addMapControl('normalize', 'topleft', initNormalize, initNormalizeToggle);
-
+          /*
           // add toggle sentiment analysis
           if(cloudberryConfig.sentimentEnabled)
             addMapControl('sentiment', 'topleft', initSentiment, initSentimentToggle);
@@ -501,6 +501,18 @@ angular.module('cloudberry.common')
         
         function cleanCountMap(){
             this.layer = null;
+            function removeMapControl(name){
+                var ctrlClass = $("."+name);
+                if (ctrlClass) {
+                  ctrlClass.remove();
+                }
+            }
+            
+            console.log("clean been called")
+            // remove CountMap controls
+            removeMapControl('legend');
+            removeMapControl('normalize');
+            //removeMapControl('sentiment');
         }
         
         function resetGeoIds(bounds, polygons, idTag) {
@@ -616,6 +628,7 @@ angular.module('cloudberry.common')
         }
         
         function deactivateFunction(){
+            cleanCountMap();
         }
         
         var watchVariables = {"countmapMapResult":"cloudberry.countmapMapResult",
