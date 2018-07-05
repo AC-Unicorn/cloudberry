@@ -1,7 +1,10 @@
 angular.module('cloudberry.map')
   .controller('multiLayerCtrl', function($timeout, $scope, $rootScope, $window, $http, $compile, cloudberryConfig, cloudberry, leafletData, Cache, createLayerService) {
     
-    cloudberry.parameters.layers = {};
+    cloudberry.parameters.layers = {
+        countmaps:{},
+        polygons:{}
+    };
     $scope.watchVariables = {};
     
     var styles = {
@@ -58,29 +61,29 @@ angular.module('cloudberry.map')
     
     $rootScope.$on('multiLayer', function (event, data) {
         var layer_name = cloudberry.parameters.maptype;
-    
+        var layer_type = 'polygons';
         
         
         if(layer_name!='heatmap' || layer_name!='pinmap'){
 
-                    $scope.map.removeLayer(cloudberry.parameters.layers['heatmap'].layer);
-                    $scope.map.removeLayer(cloudberry.parameters.layers['pinmap'].layer);
+                    $scope.map.removeLayer(cloudberry.parameters.layers[layer_type]['heatmap'].layer);
+                    $scope.map.removeLayer(cloudberry.parameters.layers[layer_type]['pinmap'].layer);
 
                     
-                    cloudberry.parameters.layers['heatmap'].active = 0;
-                    cloudberry.parameters.layers['pinmap'].active = 0;
+                    cloudberry.parameters.layers[layer_type]['heatmap'].active = 0;
+                    cloudberry.parameters.layers[layer_type]['pinmap'].active = 0;
 
         
         }
-        if (layer_name==='heatmap' || layer_name === 'pinmap' && cloudberry.parameters.layers[layer_name].active == 0 ){
-            
+        if (layer_name==='heatmap' || layer_name === 'pinmap' && cloudberry.parameters.layers[layer_type][layer_name].active == 0 ){
             $scope.setStyles(styles);
             $scope.resetPolygonLayers();
-            if (typeof cloudberry.parameters.layers[layer_name].activate === "function"){
-                cloudberry.parameters.layers[layer_name].activate();
+            var current_layer = cloudberry.parameters.layers[layer_type][layer_name];
+            if (typeof current_layer.activate === "function"){
+                current_layer.activate();
             }
-            cloudberry.parameters.layers[layer_name].active = 1;
-            $scope.map.addLayer(cloudberry.parameters.layers[layer_name].layer);
+            current_layer.active = 1;
+            $scope.map.addLayer(current_layer.layer);
         }
         
 
@@ -88,19 +91,21 @@ angular.module('cloudberry.map')
         cloudberry.query(cloudberry.parameters);
     })
     
-    function addLayer(layerID, active, parameters){
+    function addLayer(layerID, active, parameters,type){
+        
         createLayerService[layerID](parameters).then(function(layer){
-            cloudberry.parameters.layers[layerID] = layer;
-            cloudberry.parameters.layers[layerID].init($scope).then(function(){
-                cloudberry.parameters.layers[layerID].active = active;
+            cloudberry.parameters.layers[type][layerID] = layer;
+            cloudberry.parameters.layers[type][layerID].init($scope).then(function(){
+                cloudberry.parameters.layers[type][layerID].active = active;
                 for (var key in layer.watchVariables){
                     $scope.watchVariables[key] = layer.watchVariables[key];
                 }
-                if (cloudberry.parameters.layers[layerID].active){
-                    $scope.map.addLayer(cloudberry.parameters.layers[layerID].layer);
+                if (cloudberry.parameters.layers[type][layerID].active){
+                    $scope.map.addLayer(cloudberry.parameters.layers[type][layerID].layer);
                 }
             });
         });
+
     }
     
   
@@ -109,7 +114,7 @@ angular.module('cloudberry.map')
         id: "heatmap",
         dataset: "twitter.ds_tweet",
     }
-    addLayer("heatmap", 0, heatmapParameters);
+    addLayer("heatmap", 0, heatmapParameters,'polygons');
     
     var pinmapParameters = {
         id: "pinmap",
@@ -131,24 +136,26 @@ angular.module('cloudberry.map')
         }
     }
     
-    addLayer("pinmap", 0, pinmapParameters);
+    addLayer("pinmap", 0, pinmapParameters,'polygons');
 
     
     
 
     
     $scope.$on("leafletDirectiveMap.zoomend", function() {
-        for (var key in cloudberry.parameters.layers) {
-            if (cloudberry.parameters.layers[key].active && typeof cloudberry.parameters.layers[key].zoom === "function"){
-                cloudberry.parameters.layers[key].zoom();
+        for (var key in cloudberry.parameters.layers['polygons']) {
+            var current_layer = cloudberry.parameters.layers['polygons'][key];
+            if (current_layer.active && typeof current_layer.zoom === "function"){
+                current_layer.zoom();
             }
         }
     });
     
     $scope.$on("leafletDirectiveMap.dragend", function() {
-        for (var key in cloudberry.parameters.layers) {
-            if (cloudberry.parameters.layers[key].active && typeof cloudberry.parameters.layers[key].drag === "function"){
-                cloudberry.parameters.layers[key].drag();
+        for (var key in cloudberry.parameters.layers['polygons']) {
+            var current_layer = cloudberry.parameters.layers['polygons'][key];
+            if (current_layer.active && typeof current_layer.drag === "function"){
+                current_layer.drag();
             }
         }
     });
@@ -166,14 +173,14 @@ angular.module('cloudberry.map')
         function(newResult, oldValue) {
             var layer_name = cloudberry.parameters.maptype;  
             var result_name = layer_name + "MapResult";  
-        
+            var current_layer =  cloudberry.parameters.layers['polygons'][layer_name];
             if (newResult[result_name] !== oldValue[result_name]) {
                 $scope.result = newResult[result_name];
                 if (Object.keys($scope.result).length !== 0) {
                     $scope.status.init = false;
-                    cloudberry.parameters.layers[layer_name].draw($scope.result);
+                    current_layer.draw($scope.result);
                 } else {
-                    cloudberry.parameters.layers[layer_name].draw($scope.result);
+                    current_layer.draw($scope.result);
                 }
             }
         }
