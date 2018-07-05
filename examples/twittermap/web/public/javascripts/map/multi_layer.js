@@ -62,9 +62,10 @@ angular.module('cloudberry.map')
     $rootScope.$on('multiLayer', function (event, data) {
         var layer_name = cloudberry.parameters.maptype;
         var layer_type = 'polygons';
-        
-        
-        if(layer_name!='heatmap' || layer_name!='pinmap'){
+        if(layer_name==='countmap')
+            layer_type = 'countmaps';
+        //deactive unused layers
+        /*if(layer_name!='heatmap' || layer_name!='pinmap'){
 
                     $scope.map.removeLayer(cloudberry.parameters.layers[layer_type]['heatmap'].layer);
                     $scope.map.removeLayer(cloudberry.parameters.layers[layer_type]['pinmap'].layer);
@@ -74,10 +75,23 @@ angular.module('cloudberry.map')
                     cloudberry.parameters.layers[layer_type]['pinmap'].active = 0;
 
         
-        }
-        if (layer_name==='heatmap' || layer_name === 'pinmap' && cloudberry.parameters.layers[layer_type][layer_name].active == 0 ){
-            //$scope.setStyles(styles);
-            //$scope.resetPolygonLayers();
+        }*/
+        
+        for(var key in cloudberry.parameters.layers)
+            for(var k in cloudberry.parameters.layers[key])
+                if(k!=layer_name || key!=layer_type)
+                    {   
+                        
+                        if(cloudberry.parameters.layers[key][k].layer && k!='polygon'){
+                            $scope.map.removeLayer(cloudberry.parameters.layers[key][k].layer);
+                            cloudberry.parameters.layers[key][k].clear();
+                            cloudberry.parameters.layers[key][k].active = 0;
+                        }
+                    }
+                
+        //activate selected layer
+        if (cloudberry.parameters.layers[layer_type][layer_name].active == 0 ){
+
             var current_layer = cloudberry.parameters.layers[layer_type][layer_name];
             if (typeof current_layer.activate === "function"){
                 current_layer.activate();
@@ -138,7 +152,7 @@ angular.module('cloudberry.map')
     
     addLayer("pinmap", 0, pinmapParameters,'polygons');
     addLayer("polygon", 1, {},'polygons');
-
+    addLayer('countmap',1,{},'countmaps');
     
     
 
@@ -175,6 +189,8 @@ angular.module('cloudberry.map')
             var layer_name = cloudberry.parameters.maptype;  
             var result_name = layer_name + "MapResult";  
             var current_layer =  cloudberry.parameters.layers['polygons'][layer_name];
+            if(!current_layer)
+                current_layer =  cloudberry.parameters.layers['countmaps'][layer_name];
             if (newResult[result_name] !== oldValue[result_name]) {
                 $scope.result = newResult[result_name];
                 if (Object.keys($scope.result).length !== 0) {
@@ -184,8 +200,21 @@ angular.module('cloudberry.map')
                     current_layer.draw($scope.result);
                 }
             }
-        }
-    );
+            if(newResult['doNormalization'] !== oldValue['doNormalization']) {
+                $scope.doNormalization = newResult['doNormalization'];
+            
+            }
+            if(newResult['doSentiment'] !== oldValue['doSentiment']) {
+                $scope.doSentiment = newResult['doSentiment'];
+                if($scope.doSentiment) {
+                    $scope.infoPromp = "Score";  // change the info promp
+                } else {
+                    $scope.infoPromp = config.mapLegend;
+                }
+            
+            }
+        
+        });
     
     
     

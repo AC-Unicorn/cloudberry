@@ -412,7 +412,8 @@ angular.module('cloudberry.map')
           setCountLegend(div);
         }
       }
-
+        
+        
       // add legend
       addMapControl('legend', 'topleft', initLegend, null);
 
@@ -424,34 +425,34 @@ angular.module('cloudberry.map')
         addMapControl('sentiment', 'topleft', initSentiment, initSentimentToggle);
 
     }
-    
+      
     // initialize if the default map type is countmap
     
-    if (cloudberry.parameters.maptype == 'countmap'){
+    /*if (cloudberry.parameters.maptype == 'countmap'){
       setCountMapStyle();
       $scope.resetPolygonLayers();
       setInfoControlCountMap();
-    }
+    }*/
     
     
     // map type change handler
     // initialize the map (styles, zoom/drag handler, etc) when switch to this map
     // clear the map when switch to other map
     
-    function initCountMap(){
+    /*function initCountMap(){
         setCountMapStyle();
         $scope.resetPolygonLayers();
         setInfoControlCountMap();
         cloudberry.query(cloudberry.parameters, cloudberry.queryType);  
         
-    }
+    }*/
 
 
     
  
     
     
-    $rootScope.$on('maptypeChange', function (event, data) {
+    /*$rootScope.$on('maptypeChange', function (event, data) {
       if (cloudberry.parameters.maptype == 'countmap') {
         setCountMapStyle();
         $scope.resetPolygonLayers();
@@ -502,5 +503,5 @@ angular.module('cloudberry.map')
           }
         }
       }
-    );
+    );*/
   });

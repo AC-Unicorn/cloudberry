@@ -312,8 +312,7 @@ angular.module('cloudberry.common')
                     map: null,
                     geojsonData: {},
                     polygons: {},
-                    status: {},
-                    layer_style:ly_style
+                    status: {}
                 });
                 return deferred.promise;
             }

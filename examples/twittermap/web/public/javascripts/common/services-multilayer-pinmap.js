@@ -216,7 +216,7 @@ angular.module('cloudberry.common')
         }
         
         function cleanPinMap(){
-            this.layer = null;
+            
         }
         
         function createPinQuery(filter){

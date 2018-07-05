@@ -58,7 +58,6 @@ angular.module('cloudberry.common')
         }
         
         function cleanHeatMap(){
-            this.layer = null;
         }
         
         function zoomFunction(){

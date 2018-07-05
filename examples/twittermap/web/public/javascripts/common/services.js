@@ -545,7 +545,6 @@ angular.module('cloudberry.common', ['cloudberry.mapresultcache'])
     ws.onmessage = function(event) {
       $timeout(function() {
         var result = JSONbig.parse(event.data);
-
         if (result.category in cloudberryService.parameters.layers){
             if (cloudberryService.parameters.layers[result.category].active){
                 cloudberryService.parameters.layers[result.category].draw(result.value[0]);
