@@ -76,8 +76,8 @@ angular.module('cloudberry.map')
         
         }
         if (layer_name==='heatmap' || layer_name === 'pinmap' && cloudberry.parameters.layers[layer_type][layer_name].active == 0 ){
-            $scope.setStyles(styles);
-            $scope.resetPolygonLayers();
+            //$scope.setStyles(styles);
+            //$scope.resetPolygonLayers();
             var current_layer = cloudberry.parameters.layers[layer_type][layer_name];
             if (typeof current_layer.activate === "function"){
                 current_layer.activate();
@@ -137,7 +137,7 @@ angular.module('cloudberry.map')
     }
     
     addLayer("pinmap", 0, pinmapParameters,'polygons');
-    addLayer("polygon", 0, pinmapParameters,'polygons');
+    addLayer("polygon", 1, {},'polygons');
 
     
     
