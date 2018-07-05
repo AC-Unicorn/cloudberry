@@ -137,6 +137,7 @@ angular.module('cloudberry.map')
     }
     
     addLayer("pinmap", 0, pinmapParameters,'polygons');
+    addLayer("polygon", 0, pinmapParameters,'polygons');
 
     
     

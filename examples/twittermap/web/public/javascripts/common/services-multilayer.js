@@ -1,8 +1,8 @@
 angular.module('cloudberry.common')
-    .service('createLayerService', function(multilayerHeatmap,multilayerPinmap){
+    .service('createLayerService', function(multilayerHeatmap,multilayerPinmap,multilayerPolygon){
         var createLayerService = {
             polygon: {},
-            countmap: {},
+            countmap: multilayerPolygon.createLayer,
             heatmap: multilayerHeatmap.createLayer,
             pinmap: multilayerPinmap.createLayer
         };
