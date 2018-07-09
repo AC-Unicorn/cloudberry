@@ -1,5 +1,5 @@
 angular.module('cloudberry.common')
-    .service('multilayerCountmap', function($http, $timeout, $q, $compile, cloudberry, cloudberryConfig, leafletData){
+    .service('multilayerCountmap', function($http, $timeout,$q, $compile, cloudberry, cloudberryConfig, leafletData){
         function initCountMap(scope){
             var instance = this;
             this.scope = scope;
@@ -110,10 +110,10 @@ angular.module('cloudberry.common')
                 this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
                 this._div.style.margin = '20% 0 0 0';
                 this._div.innerHTML = [
-                    '<h4><span ng-bind="infoPromp + \' by \' + status.logicLevel"></span></h4>',
-                    '<b><span ng-bind="selectedPlace.properties.name || \'No place selected\'"></span></b>',
+                    '<h4>'+'</h4>',
+                    '<b></b>',
                     '<br/>',
-                    '<span ng-bind="infoPromp"></span> <span ng-bind="selectedPlace.properties.countText || \'0\'"></span>'
+                    ''
                 ].join('');
                 $compile(this._div)(this);
                 return this._div;
@@ -124,8 +124,22 @@ angular.module('cloudberry.common')
             info.options = {
                 position: 'topleft'
             };
-            //info.addTo(instance.map);
-            this.scope.controls.custom.push(info);
+            
+            
+            
+            instance.scope.$watch(function(){
+                return scope;
+            },function(result){
+                console.log(scope.status.logicalLevel);
+            })
+            
+//            instance.scope.$watch(function(){
+//                return instance.map;
+//            },function(result){
+//                info.addTo(instance.map);
+//            })
+            
+            //this.scope.controls.custom.push(info);
             
             // update the center and the boundary of the visible area of the map
             function setCenterAndBoundry(features){
