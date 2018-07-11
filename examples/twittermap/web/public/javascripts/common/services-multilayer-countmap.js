@@ -5,7 +5,8 @@ angular.module('cloudberry.common')
             this.scope = scope;
             this.doNormalization = false;
             this.doSentiment = false;
-            
+            instance.selectedPlace = "no place selected";
+            instance.countText = '0';
             this.layer = L.layerGroup();
             
             countmapStyle = {
@@ -73,7 +74,9 @@ angular.module('cloudberry.common')
                 if (!L.Browser.ie && !L.Browser.opera) {
                     layer.bringToFront();
                 }
-                instance.selectedPlace = layer.feature;
+                
+                instance.selectedPlace = layer.feature.properties.name;
+                instance.countText = layer.feature.properties.countText;
             }
 
             // remove the highlight interaction function for the polygons
@@ -95,7 +98,7 @@ angular.module('cloudberry.common')
             this.onEachFeature = function onEachFeature(feature, layer) {
                 layer.on({
                     mouseover: highlightFeature,
-                    mouseout: resetHighlight,
+                    mouseout: resetHighlight
                 });
             }
             
@@ -105,14 +108,18 @@ angular.module('cloudberry.common')
 
             // add info control
             var info = L.control();
-
+            var logical_level = cloudberry.parameters.geoLevel;
+            var placeName = "No place selected";
+            var countText = '0';
+            var info_div;
             info.onAdd = function() {
                 this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
                 this._div.style.margin = '20% 0 0 0';
+                info_div = this._div;
                 this._div.innerHTML = [
-                    '<h4>'+'</h4>',
-                    '<b></b>',
-                    '<br/>',
+                    '<h4>Count: by '+logical_level+'</h4>',
+                    '<b>'+placeName+'</b>',
+                    '<br/>Count: '+countText,
                     ''
                 ].join('');
                 $compile(this._div)(this);
@@ -126,20 +133,35 @@ angular.module('cloudberry.common')
             };
             
             
-            
+     
+
             instance.scope.$watch(function(){
-                return scope;
+                return instance.map;
             },function(result){
-                console.log(scope.status.logicalLevel);
+                info.addTo(instance.map);
             })
             
-//            instance.scope.$watch(function(){
-//                return instance.map;
-//            },function(result){
-//                info.addTo(instance.map);
-//            })
             
-            //this.scope.controls.custom.push(info);
+            scope.$watchCollection(function(){
+                return { 'if':instance.selectedPlace,
+                         'gl':cloudberry.parameters.geoLevel};
+                    
+            },function(oldResult,newResult){
+                
+                    
+                    if(!instance.countText)
+                        instance.countText = '0';
+                
+                    info_div.innerHTML = innerHTML = [
+                    '<h4>Count: by '+cloudberry.parameters.geoLevel+'</h4>',
+                    '<b>'+instance.selectedPlace+'</b>',
+                    '<br/>Count: '+instance.countText,
+                    ''].join('');
+            
+                
+            });
+            
+            //scope.controls.custom.push(info);
             
             // update the center and the boundary of the visible area of the map
             function setCenterAndBoundry(features){

@@ -1,6 +1,7 @@
 angular.module('cloudberry.map')
   .controller('multiLayerCtrl', function($timeout, $scope, $rootScope, $window, $http, $compile, cloudberryConfig, cloudberry, leafletData, Cache, createLayerService) {
     
+    cloudberry.logicalLevel = 'state';
     cloudberry.parameters.layers = {
         countmaps:{},
         polygons:{}
@@ -61,6 +62,7 @@ angular.module('cloudberry.map')
     
     $rootScope.$on('multiLayer', function (event, data) {
         var layer_name = cloudberry.parameters.maptype;
+        
         var layer_type = 'polygons';
         if(layer_name==='countmap')
             layer_type = 'countmaps';
@@ -155,6 +157,7 @@ angular.module('cloudberry.map')
     addLayer('countmap',1,{},'countmaps');
     
     
+        
 
     
     $scope.$on("leafletDirectiveMap.zoomend", function() {
@@ -164,6 +167,12 @@ angular.module('cloudberry.map')
                 current_layer.zoom();
             }
         }
+        for (var key in cloudberry.parameters.layers['countmaps']){
+            var currentLayer = cloudberry.parameters.layers['countmaps'][key];
+            if(currentLayer.active && typeof currentLayer.zoom === 'function')
+                current_layer.zoom();
+        }
+    
     });
     
     $scope.$on("leafletDirectiveMap.dragend", function() {
@@ -173,7 +182,18 @@ angular.module('cloudberry.map')
                 current_layer.drag();
             }
         }
+        for (var key in cloudberry.parameters.layers['countmaps']){
+            var currentLayer = cloudberry.parameters.layers['countmaps'][key];
+            if(currentLayer.active && typeof currentLayer.zoom === 'function')
+                current_layer.drag();
+        }
     });
+    
+    
+
+
+    
+    
     
     $scope.$watchCollection(
         function() {
@@ -213,6 +233,7 @@ angular.module('cloudberry.map')
                 }
             
             }
+           
         
         });
     

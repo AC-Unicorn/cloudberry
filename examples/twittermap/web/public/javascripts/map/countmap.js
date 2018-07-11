@@ -125,7 +125,7 @@ angular.module('cloudberry.map')
 
       // add info control
       var info = L.control();
-
+      
       info.onAdd = function() {
         this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
         this._div.style.margin = '20% 0 0 0';
