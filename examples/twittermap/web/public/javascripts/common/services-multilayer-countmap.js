@@ -1,17 +1,14 @@
 angular.module('cloudberry.common')
     .service('multilayerCountmap', function($http, $timeout,$q, $compile, cloudberry, cloudberryConfig, leafletData){
-        let scp = {}
         function initCountMap(scope){
             var instance = this;
             this.scope = scope;
-            scp = scope;
             this.doNormalization = false;
             this.doSentiment = false;
             instance.selectedPlace = "no place selected";
             instance.countText = '0';
             this.layer = L.layerGroup();
             instance.normalize = null;
-            instance.normalizeInit = false;
             
             countmapStyle = {
                 initStyle: {
@@ -64,13 +61,6 @@ angular.module('cloudberry.common')
             }
             
             this.styles = countmapStyle;
-            
-            
-            
-            function setInfoControlCountMap(){
-                
-                
-            } 
             
             function highlightFeature(leafletEvent) {
                 var layer = leafletEvent.target;
@@ -129,24 +119,19 @@ angular.module('cloudberry.common')
                 ].join('');
                 $compile(this._div)(this);
                 return this._div;
-            };
-            
-            
+            };     
 
             info.options = {
                 position: 'topleft'
             };
             
-            
-     
-
             instance.scope.$watch(function(){
                 return instance.map;
             },function(result){
                 info.addTo(instance.map);
             })
             
-            
+            //watch variable for left up corner's info control
             scope.$watchCollection(function(){
                 return { 'if':instance.selectedPlace,
                          'gl':cloudberry.parameters.geoLevel};
@@ -165,7 +150,7 @@ angular.module('cloudberry.common')
             
                 
             });
-            
+            //watch normalize switch and redraw map, when switch is on.
             scope.$watch(function(){
                 return instance.normalize;
             },function(result){
@@ -179,11 +164,6 @@ angular.module('cloudberry.common')
                             drawCountMap(scope.result,instance);
                     })
             },true)
-   
-            
-
-            
-            //scope.controls.custom.push(info);
             
             // update the center and the boundary of the visible area of the map
             function setCenterAndBoundry(features){
@@ -444,9 +424,7 @@ angular.module('cloudberry.common')
             };
               
             
-            if (instance.map) {
-              
-              
+            if (instance.map) {   
               instance[name].addTo(instance.map);
               if (initJS)
                 initJS();
@@ -454,8 +432,7 @@ angular.module('cloudberry.common')
           }
 
           function initNormalize(div) {
-            
-              
+                          
             if(instance.doNormalization)
               div.innerHTML = '<p>Normalize</p><input id="toggle-normalize" checked type="checkbox">';
             else
@@ -551,9 +528,6 @@ angular.module('cloudberry.common')
             }
           }
 
-          
-
-          
           if(Object.keys(instance.scope.result).length !== 0){
             // add legend
             addMapControl('legend', 'topleft', initLegend, null);
@@ -561,23 +535,9 @@ angular.module('cloudberry.common')
             addMapControl('normalize', 'topleft', initNormalize, initNormalizeToggle);
           }
           
-          
-          instance.normalize =  $('#toggle-normalize').prop('checked');
-            
-          
-            /*
-          // add toggle sentiment analysis
-          if(cloudberryConfig.sentimentEnabled)
-            addMapControl('sentiment', 'topleft', initSentiment, initSentimentToggle);
-          */
-              
-      
-            
+          instance.normalize =  $('#toggle-normalize').prop('checked');  
         }
     
- 
-
-        
         function cleanCountMap(){
             
             function removeMapControl(name){
@@ -586,12 +546,10 @@ angular.module('cloudberry.common')
                   ctrlClass.remove();
                 }
             }
-            
+
             // remove CountMap controls
             removeMapControl('legend');
             removeMapControl('normalize');
-            //removeMapControl('info');
-            //removeMapControl('sentiment');
         }
         
         function resetGeoIds(bounds, polygons, idTag) {
