@@ -1,13 +1,17 @@
 angular.module('cloudberry.common')
     .service('multilayerCountmap', function($http, $timeout,$q, $compile, cloudberry, cloudberryConfig, leafletData){
+        let scp = {}
         function initCountMap(scope){
             var instance = this;
             this.scope = scope;
+            scp = scope;
             this.doNormalization = false;
             this.doSentiment = false;
             instance.selectedPlace = "no place selected";
             instance.countText = '0';
             this.layer = L.layerGroup();
+            instance.normalize = null;
+            instance.normalizeInit = false;
             
             countmapStyle = {
                 initStyle: {
@@ -98,7 +102,8 @@ angular.module('cloudberry.common')
             this.onEachFeature = function onEachFeature(feature, layer) {
                 layer.on({
                     mouseover: highlightFeature,
-                    mouseout: resetHighlight
+                    mouseout: resetHighlight,
+                    click:scope.zoomToFeature
                 });
             }
             
@@ -160,6 +165,23 @@ angular.module('cloudberry.common')
             
                 
             });
+            
+            scope.$watch(function(){
+                return instance.normalize;
+            },function(result){
+                if(result!==null)
+                    scope.$watch(function(){
+                        return $('#toggle-normalize').prop('checked');
+                    },function(resultN){
+                        scope.doNormalization = resultN;
+                        instance.doNormalization = resultN;
+                        if(cloudberry.parameters.maptype==="countmap")
+                            drawCountMap(scope.result,instance);
+                    })
+            },true)
+   
+            
+
             
             //scope.controls.custom.push(info);
             
@@ -270,11 +292,10 @@ angular.module('cloudberry.common')
             return deferred.promise;
         }
         
-        function drawCountMap(result){
-          var instance = this;
-          
-          var colors = this.styles.colors;
-          var sentimentColors = this.styles.sentimentColors;
+        function drawCountMap(result,ref=this){
+          var instance = ref;
+          var colors = ref.styles.colors;
+          var sentimentColors = ref.styles.sentimentColors;
           var normalizedCountMax = 0,
               normalizedCountMin = 0,
               intervals = colors.length - 1,
@@ -531,17 +552,31 @@ angular.module('cloudberry.common')
           }
 
           
-          // add legend
-          addMapControl('legend', 'topleft', initLegend, null);
+
           
-          // add toggle normalize
-          addMapControl('normalize', 'topleft', initNormalize, initNormalizeToggle);
-          /*
+          if(Object.keys(instance.scope.result).length !== 0){
+            // add legend
+            addMapControl('legend', 'topleft', initLegend, null);
+            // add toggle normalize
+            addMapControl('normalize', 'topleft', initNormalize, initNormalizeToggle);
+          }
+          
+          
+          instance.normalize =  $('#toggle-normalize').prop('checked');
+            
+          
+            /*
           // add toggle sentiment analysis
           if(cloudberryConfig.sentimentEnabled)
             addMapControl('sentiment', 'topleft', initSentiment, initSentimentToggle);
           */
+              
+      
+            
         }
+    
+ 
+
         
         function cleanCountMap(){
             
@@ -555,6 +590,7 @@ angular.module('cloudberry.common')
             // remove CountMap controls
             removeMapControl('legend');
             removeMapControl('normalize');
+            //removeMapControl('info');
             //removeMapControl('sentiment');
         }
         
@@ -673,9 +709,7 @@ angular.module('cloudberry.common')
         function deactivateFunction(){
         }
         
-        var watchVariables = {"countmapMapResult":"cloudberry.countmapMapResult",
-                              "doNormalization":"$('#toggle-normalize').prop('checked')",
-                              "doSentiment":"$('#toggle-sentiment').prop('checked')"};
+        var watchVariables = {"countmapMapResult":"cloudberry.countmapMapResult"};
         
         var countmapService = {
             createLayer: function(parameters){

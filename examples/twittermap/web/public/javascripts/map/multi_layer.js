@@ -94,12 +94,12 @@ angular.module('cloudberry.map')
         //activate selected layer
         if (cloudberry.parameters.layers[layer_type][layer_name].active == 0 ){
 
-            var current_layer = cloudberry.parameters.layers[layer_type][layer_name];
-            if (typeof current_layer.activate === "function"){
-                current_layer.activate();
+            var currentLayer = cloudberry.parameters.layers[layer_type][layer_name];
+            if (typeof currentLayer.activate === "function"){
+                currentLayer.activate();
             }
-            current_layer.active = 1;
-            $scope.map.addLayer(current_layer.layer);
+            currentLayer.active = 1;
+            $scope.map.addLayer(currentLayer.layer);
         }
         
 
@@ -162,30 +162,32 @@ angular.module('cloudberry.map')
     
     $scope.$on("leafletDirectiveMap.zoomend", function() {
         for (var key in cloudberry.parameters.layers['polygons']) {
-            var current_layer = cloudberry.parameters.layers['polygons'][key];
-            if (current_layer.active && typeof current_layer.zoom === "function"){
-                current_layer.zoom();
+            var currentLayer = cloudberry.parameters.layers['polygons'][key];
+            if (currentLayer.active && typeof currentLayer.zoom === "function"){
+                currentLayer.zoom();
             }
         }
         for (var key in cloudberry.parameters.layers['countmaps']){
             var currentLayer = cloudberry.parameters.layers['countmaps'][key];
             if(currentLayer.active && typeof currentLayer.zoom === 'function')
-                current_layer.zoom();
+             {
+                 currentLayer.zoom();
+             }   
         }
     
     });
     
     $scope.$on("leafletDirectiveMap.dragend", function() {
         for (var key in cloudberry.parameters.layers['polygons']) {
-            var current_layer = cloudberry.parameters.layers['polygons'][key];
-            if (current_layer.active && typeof current_layer.drag === "function"){
-                current_layer.drag();
+            var currentLayer = cloudberry.parameters.layers['polygons'][key];
+            if (currentLayer.active && typeof currentLayer.drag === "function"){
+                currentLayer.drag();
             }
         }
         for (var key in cloudberry.parameters.layers['countmaps']){
             var currentLayer = cloudberry.parameters.layers['countmaps'][key];
             if(currentLayer.active && typeof currentLayer.zoom === 'function')
-                current_layer.drag();
+                currentLayer.drag();
         }
     });
     
@@ -206,33 +208,24 @@ angular.module('cloudberry.map')
             return obj;
         },
         function(newResult, oldValue) {
+            console.log(newResult);
             var layer_name = cloudberry.parameters.maptype;  
             var result_name = layer_name + "MapResult";  
-            var current_layer =  cloudberry.parameters.layers['polygons'][layer_name];
-            if(!current_layer)
-                current_layer =  cloudberry.parameters.layers['countmaps'][layer_name];
+            var currentLayer =  cloudberry.parameters.layers['polygons'][layer_name];
+            if(!currentLayer)
+                currentLayer =  cloudberry.parameters.layers['countmaps'][layer_name];
             if (newResult[result_name] !== oldValue[result_name]) {
                 $scope.result = newResult[result_name];
                 if (Object.keys($scope.result).length !== 0) {
                     $scope.status.init = false;
-                    current_layer.draw($scope.result);
+                    currentLayer.draw($scope.result);
+                    console.log("been called");
                 } else {
-                    current_layer.draw($scope.result);
+                    currentLayer.draw($scope.result);
+                    console.log("been called 2");
                 }
             }
-            if(newResult['doNormalization'] !== oldValue['doNormalization']) {
-                $scope.doNormalization = newResult['doNormalization'];
-            
-            }
-            if(newResult['doSentiment'] !== oldValue['doSentiment']) {
-                $scope.doSentiment = newResult['doSentiment'];
-                if($scope.doSentiment) {
-                    $scope.infoPromp = "Score";  // change the info promp
-                } else {
-                    $scope.infoPromp = config.mapLegend;
-                }
-            
-            }
+
            
         
         });
