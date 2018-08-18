@@ -13,14 +13,23 @@ angular.module('cloudberry.util', ['cloudberry.common'])
               var suggestion = [];
               for(var i=0;i<data.topics.length;i++)
               {
-                suggestion.push(String(data.topics[i].topic));
+                var value = String(data.topics[i].topic);
+                if(value[0] !== "#" && !suggestion.includes(value)){
+                  suggestion.push(value);
+                }
               }
               $("#keyword-textbox").autocomplete({source:suggestion});
             });
           
         })
+        
+        $( "#keyword-textbox" ).on( "autocompleteselect", function( event, ui ) {
+          $scope.keyword = ui.item.value;
+          $scope.search();
+          $scope.updateSearchBox($scope.keyword);
+        } );
 
-  
+      
   
       $scope.search = function() {
           if ($scope.keyword && $scope.keyword.trim().length > 0) {
