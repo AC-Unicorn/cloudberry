@@ -268,9 +268,9 @@ angular.module("cloudberry.common")
           filter,
           select: {
             order: ["-create_at"],
-            limit: queryUtil.defaultSamplingSize,
+            limit: sampleSize,
             offset: 0,
-            field: ["create_at", "id", "user.id"]
+            field: ["create_at", "id", "user.id","geo_tag."+spatialField]
           }
         };
       }

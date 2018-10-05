@@ -1,10 +1,11 @@
 angular.module("cloudberry.sidebar", ["cloudberry.common"])
-  .controller("SidebarCtrl", function($scope, cloudberry, moduleManager, cloudberryClient, queryUtil, $http) {
+  .controller("SidebarCtrl", function($rootScope, $scope, cloudberry, moduleManager, cloudberryClient, queryUtil, $http) {
 
     // Flag whether current result is outdated
     $scope.isHashTagOutdated = true;
     $scope.isSampleTweetsOutdated = true;
     $scope.sampleTweets = [];
+    $scope.countUpdate = [];
     var timeRange = 3; // Set leng of time interval
     var sendQueryLoop = {}; //Store variable for window.setInterval function, keep only one setInterval function avtive at a time
     $scope.liveTweetsLoop = {};//Store variable for winddow.setInterval function, stop live tweets feeding when user specified a 
@@ -30,11 +31,13 @@ angular.module("cloudberry.sidebar", ["cloudberry.common"])
       $scope.isHashTagOutdated = false;
     }
 
-    function sendSampleTweetsQuery(timeLowerBound,timeUpperBound) {
+    function sendSampleTweetsQuery(timeLowerBound,timeUpperBound,tweetSize=10) {
       var parameters = cloudberry.parameters;
-      var sampleTweetsRequest = queryUtil.getSampleTweetsRequest(cloudberry.parameters,timeLowerBound,timeUpperBound);
+      var sampleTweetsRequest = queryUtil.getSampleTweetsRequest(cloudberry.parameters,timeLowerBound,timeUpperBound,tweetSize);
       cloudberryClient.send(sampleTweetsRequest, function(id, resultSet) {
+          console.log(resultSet[0].length)
           $scope.sampleTweets = $scope.sampleTweets.concat(resultSet[0]);//oldest tweet will be at front
+          $scope.countUpdate = resultSet[0];
       }, "sampleTweetsRequest");
       $scope.isSampleTweetsOutdated = false;
     }
@@ -69,6 +72,7 @@ angular.module("cloudberry.sidebar", ["cloudberry.common"])
           });
         }
         else{
+          
           window.clearInterval(sendQueryLoop);
           $scope.sampleTweets = [];//Clean the queue for old event;
           var tempDateTime = (new Date(Date.now()));
@@ -82,9 +86,10 @@ angular.module("cloudberry.sidebar", ["cloudberry.common"])
             var tempDateTime = (new Date(Date.now()));
             tempDateTime.setHours(tempDateTime.getHours()-timeZoneOffset);
             timeUpperBound = tempDateTime.toISOString();
-            tempDateTime.setSeconds(tempDateTime.getSeconds()-timeRange);
+            tempDateTime.setSeconds(tempDateTime.getSeconds()-20);
             timeLowerBound = tempDateTime.toISOString();
-            sendSampleTweetsQuery(timeLowerBound,timeUpperBound,1);
+            sendSampleTweetsQuery(timeLowerBound,timeUpperBound,10);
+            $rootScope.$emit("CallParentMethod", {"data":$scope.countUpdate});
           },timeRange*1000);//send query every second
           $scope.cleanLiveTweet();
           $scope.startLiveTweet();
