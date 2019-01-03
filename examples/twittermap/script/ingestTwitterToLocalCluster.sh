@@ -23,6 +23,7 @@ set -o nounset                              # Treat unset variables as an error
 host=${1:-'http://localhost:19002/query/service'}
 nc=${2:-"asterix_nc1"}
 cat <<EOF | curl -XPOST --data-binary @- $host 
+drop dataverse twitter; 
 create dataverse twitter if not exists; 
 use twitter; 
 create type typeUser if not exists as open { 
