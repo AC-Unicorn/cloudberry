@@ -8,7 +8,7 @@ angular.module('cloudberry.timeseries', ['cloudberry.common'])
     $scope.currentTweetCount = 0;
     $scope.queried = false;
     $scope.sumText = config.sumText;
-    $scope.drawTimeSereis = true;
+    $scope.drawTimeBar = true;
     const initialTimeBarStart = new Date(cloudberry.startDate);
     initialTimeBarStart.setMonth(initialTimeBarStart.getMonth()-1);
     const initialTimeBarEnd = new Date(cloudberry.parameters.timeInterval.end);
@@ -46,12 +46,18 @@ angular.module('cloudberry.timeseries', ['cloudberry.common'])
     $compile(countDiv)($scope);
     stats.appendChild(countDiv);
 
-    // This function will redraw timebar whenever new event has been triggered
-    var enableTimebarChange = function(){
+    /**
+    * Handle events for timebar:
+    *   reset cloudberry.parameters.interval.start and cloudberry.parameters.interval.end 
+    *   by calling requestFunc. 
+    *   Request data for redraw the timeBar 
+    * @returns None
+    */
+    var timeBarHandler = function(){
         var min = new Date(initialTimeBarStart);
         var max = new Date(initialTimeBarEnd);
-        if(!$scope.drawTimeSereis) {
-            $scope.drawTimeSereis = true;
+        if(!$scope.drawTimeBar) {
+            $scope.drawTimeBar = true;
             requestFunc(min,max);
         }
     };
@@ -62,9 +68,9 @@ angular.module('cloudberry.timeseries', ['cloudberry.common'])
       moduleManager.publishEvent(moduleManager.EVENT.CHANGE_TIME_SERIES_RANGE, {min, max});
     };
 
-    moduleManager.subscribeEvent(moduleManager.EVENT.CHANGE_ZOOM_LEVEL,enableTimebarChange);
-    moduleManager.subscribeEvent(moduleManager.EVENT.CHANGE_REGION_BY_DRAG,enableTimebarChange);
-    moduleManager.subscribeEvent(moduleManager.EVENT.CHANGE_SEARCH_KEYWORD,enableTimebarChange);
+    moduleManager.subscribeEvent(moduleManager.EVENT.CHANGE_ZOOM_LEVEL,timeBarHandler);
+    moduleManager.subscribeEvent(moduleManager.EVENT.CHANGE_REGION_BY_DRAG,timeBarHandler);
+    moduleManager.subscribeEvent(moduleManager.EVENT.CHANGE_SEARCH_KEYWORD,timeBarHandler);
 
 
     // TODO - get rid of this watch by doing work inside the callback function through cloudberryClient.send()
@@ -96,7 +102,7 @@ angular.module('cloudberry.timeseries', ['cloudberry.common'])
 
             $scope.newResultDict = temp;
 
-            if($scope.drawTimeSereis) {
+            if($scope.drawTimeBar) {
                 $scope.newResultsCount = Object.values($scope.newResultDict);
                 $scope.newResultsDay = Object.keys($scope.newResultDict).map(x=>x.replace(/-/g,'/'));
                 $scope.drawCharts($scope.newResultsDay, $scope.newResultsCount);
@@ -119,12 +125,9 @@ angular.module('cloudberry.timeseries', ['cloudberry.common'])
       var height = 160 - margin.top - margin.bottom;
       var minDate = cloudberry.startDate;
       var maxDate = cloudberry.parameters.timeInterval.end;
-
       var startDate = (minDate.getFullYear()+"-"+(minDate.getMonth()+1));
       var endDate = (maxDate.getFullYear()+"-"+(maxDate.getMonth()+1));
-
-
-
+      
       $scope.drawCharts = function (day, count) {
 
           var resetZoomButton = {
@@ -153,11 +156,11 @@ angular.module('cloudberry.timeseries', ['cloudberry.common'])
                           var maxRatio = selectedMax / (timeBarRange);
                           var min = new Date(left + minRatio * difference);
                           var max = new Date(left + maxRatio * difference);
-                          $scope.drawTimeSereis = false;
+                          $scope.drawTimeBar = false;
                           requestFunc(min, max);
                       }
                       else{
-                          enableTimebarChange();
+                          timeBarHandler();
                       }
 
                   }
